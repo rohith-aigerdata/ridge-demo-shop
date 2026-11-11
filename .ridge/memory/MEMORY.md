@@ -1,0 +1,1 @@
+- order-404.md: GET /api/orders/:id needs explicit 404 check

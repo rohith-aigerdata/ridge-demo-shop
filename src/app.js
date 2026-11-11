@@ -36,6 +36,7 @@ export function createApp() {
 
   app.get("/api/orders/:id", (req, res) => {
     const order = getOrder(req.params.id);
+    if (!order) return res.status(404).json({ error: "order not found" });
     res.json({ id: order.id, status: order.status, items: order.items.length, total: order.total });
   });
 

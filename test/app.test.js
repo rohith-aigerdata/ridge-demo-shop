@@ -30,6 +30,12 @@ test("cart total for single items", async () => {
   assert.equal(t.subtotal, 1450 + 650);
 });
 
+test("unknown order is a 404", async () => {
+  const res = await fetch(base + "/api/orders/4242");
+  assert.equal(res.status, 404);
+  assert.equal((await res.json()).error, "order not found");
+});
+
 test("placing and reading back an order", async () => {
   const res = await post("/api/orders", { customer: "ana", items: [{ id: "p2", qty: 1 }] });
   assert.equal(res.status, 201);
