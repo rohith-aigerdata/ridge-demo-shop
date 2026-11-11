@@ -42,6 +42,9 @@ export function createApp() {
   return app;
 }
 
+const FREE_SHIPPING_THRESHOLD = 5000; // cents
+const SHIPPING_FEE = 499; // cents
+
 export function cartTotal(items) {
   let subtotal = 0;
   for (const item of items) {
@@ -49,5 +52,6 @@ export function cartTotal(items) {
     if (!product) continue;
     subtotal += product.price;
   }
-  return { subtotal, total: subtotal };
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  return { subtotal, shipping, total: subtotal + shipping };
 }
