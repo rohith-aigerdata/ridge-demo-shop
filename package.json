@@ -1,0 +1,16 @@
+{
+  "name": "ridge-demo-shop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Demo storefront that Ridge's AI agents maintain",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@sentry/node": "^10.0.0",
+    "express": "^5.1.0"
+  }
+}

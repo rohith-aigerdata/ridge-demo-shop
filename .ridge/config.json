@@ -1,0 +1,4 @@
+{
+  "verify": "npm test",
+  "prewarm": "npm ci --no-audit --no-fund"
+}
