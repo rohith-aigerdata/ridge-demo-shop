@@ -44,6 +44,19 @@ test("shipping is free when subtotal is $50 or more", async () => {
   assert.equal(t.total, t.subtotal);
 });
 
+test("storefront page is served at /", async () => {
+  const res = await fetch(base + "/");
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type"), /text\/html/);
+});
+
+test("storefront page renders the catalog and cart regions", async () => {
+  const html = await (await fetch(base + "/")).text();
+  for (const hook of ['id="products"', 'id="lines"', 'id="totals"', 'id="checkout"', 'id="status"']) {
+    assert.ok(html.includes(hook), `missing ${hook}`);
+  }
+});
+
 test("placing and reading back an order", async () => {
   const res = await post("/api/orders", { customer: "ana", items: [{ id: "p2", qty: 1 }] });
   assert.equal(res.status, 201);

@@ -5,72 +5,277 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ridge Demo Shop</title>
   <style>
-    :root { --ink: #0b0d12; --pearl: #f5f5f7; --rule: #d9dee5; --muted: #5e6573; --cyan: #00b8e6; }
+    :root {
+      --ink: #0b0d12;
+      --paper: #ffffff;
+      --pearl: #f3f5f8;
+      --rule: #e2e7ee;
+      --muted: #5e6573;
+      --cyan: #00b8e6;
+      --cyan-deep: #0089ad;
+      --radius: 14px;
+      --shadow: 0 1px 2px rgba(11, 13, 18, .05), 0 8px 24px rgba(11, 13, 18, .06);
+      --shadow-lift: 0 2px 4px rgba(11, 13, 18, .06), 0 18px 40px rgba(11, 13, 18, .12);
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--pearl); color: var(--ink); }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 20px 32px; border-bottom: 1px solid var(--rule); background: #fff; }
-    h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
-    .eyebrow { font: 11px/1 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-    main { display: grid; grid-template-columns: 1fr 320px; gap: 24px; padding: 24px 32px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-    .card { background: #fff; border: 1px solid var(--rule); border-radius: 2px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-    .price { font-family: ui-monospace, monospace; font-weight: 600; }
-    button { cursor: pointer; border: 1px solid var(--ink); background: var(--ink); color: var(--pearl); border-radius: 2px; padding: 8px 12px; font-weight: 600; }
-    button:hover { background: transparent; color: var(--ink); }
-    aside { background: #fff; border: 1px solid var(--rule); border-radius: 2px; padding: 16px; height: fit-content; }
-    .row { display: flex; justify-content: space-between; padding: 4px 0; }
-    .total { border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 8px; font-weight: 700; }
-    @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--pearl);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .eyebrow {
+      font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .price { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    header {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 16px clamp(16px, 4vw, 48px);
+      background: rgba(255, 255, 255, .88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .mark {
+      width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+      background: linear-gradient(140deg, var(--ink), #2b3242);
+      color: #fff; font-weight: 700; font-size: 15px; letter-spacing: -.02em;
+    }
+    h1 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .brand .eyebrow { display: block; }
+
+    #status {
+      min-height: 20px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 4px 10px; border-radius: 999px;
+      background: transparent; color: var(--muted);
+      transition: background .2s ease, color .2s ease;
+    }
+    #status.ok { background: rgba(0, 184, 230, .14); color: var(--cyan-deep); }
+    #status.err { background: rgba(214, 58, 58, .12); color: #a32020; }
+    #status:empty { padding: 0; }
+
+    .hero {
+      padding: clamp(28px, 6vw, 56px) clamp(16px, 4vw, 48px) clamp(12px, 3vw, 24px);
+      max-width: 720px;
+    }
+    .hero h2 { margin: 10px 0 8px; font-size: clamp(28px, 5vw, 42px); line-height: 1.1; letter-spacing: -.03em; }
+    .hero p { margin: 0; color: var(--muted); font-size: 16px; }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: clamp(16px, 3vw, 32px);
+      padding: 8px clamp(16px, 4vw, 48px) 64px;
+      align-items: start;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: clamp(12px, 2vw, 20px); }
+
+    .card {
+      position: relative;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 18px;
+      display: flex; flex-direction: column; gap: 10px;
+      box-shadow: var(--shadow);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: #cfd6e0; }
+    .thumb {
+      height: 96px; border-radius: 10px; margin-bottom: 2px;
+      background: linear-gradient(135deg, var(--pearl), #e6ebf2 60%, rgba(0, 184, 230, .22));
+      display: grid; place-items: center;
+      font: 700 26px/1 Inter, system-ui, sans-serif; color: rgba(11, 13, 18, .28); letter-spacing: -.04em;
+    }
+    .chip {
+      align-self: flex-start;
+      padding: 3px 9px; border-radius: 999px;
+      background: var(--pearl); border: 1px solid var(--rule);
+      font: 600 10px/1.6 ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    }
+    .card strong { font-size: 15px; letter-spacing: -.01em; }
+    .card .price { font-size: 17px; }
+    .card .foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+    button {
+      cursor: pointer; font: inherit; font-weight: 600;
+      border: 1px solid var(--ink); background: var(--ink); color: #fff;
+      border-radius: 10px; padding: 9px 14px;
+      transition: background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
+    }
+    button:hover { background: var(--cyan-deep); border-color: var(--cyan-deep); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible, [data-id]:focus-visible { outline: 3px solid rgba(0, 184, 230, .45); outline-offset: 2px; }
+    button[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+    aside {
+      position: sticky; top: 82px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    aside h3 { margin: 6px 0 14px; font-size: 16px; letter-spacing: -.01em; }
+    .line { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--rule); }
+    .line .name { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .qty { display: flex; align-items: center; gap: 6px; }
+    .qty button {
+      width: 26px; height: 26px; padding: 0; border-radius: 8px; line-height: 1;
+      background: var(--pearl); color: var(--ink); border-color: var(--rule);
+    }
+    .qty button:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .qty span { min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; font-size: 14px; }
+    .empty { margin: 0; padding: 18px 0; color: var(--muted); font-size: 14px; text-align: center; }
+    .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 5px 0; font-size: 14px; }
+    .row span:first-child { color: var(--muted); }
+    .total { border-top: 1px solid var(--rule); margin-top: 10px; padding-top: 12px; font-weight: 700; font-size: 16px; }
+    .total span:first-child { color: var(--ink); }
+    .hint {
+      margin-top: 12px; padding: 10px 12px; border-radius: 10px;
+      background: rgba(0, 184, 230, .1); color: var(--cyan-deep);
+      font-size: 13px; font-weight: 600;
+    }
+    #checkout { width: 100%; margin-top: 14px; padding: 12px; }
+    footer { padding: 0 clamp(16px, 4vw, 48px) 40px; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 860px) {
+      main { grid-template-columns: 1fr; }
+      aside { position: static; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+      .card:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div><div class="eyebrow">01 / Storefront</div><h1>Ridge Demo Shop</h1></div>
-    <span class="eyebrow" id="status"></span>
+    <div class="brand">
+      <div class="mark" aria-hidden="true">R</div>
+      <div>
+        <div class="eyebrow">01 / Storefront</div>
+        <h1>Ridge Demo Shop</h1>
+      </div>
+    </div>
+    <span class="eyebrow" id="status" role="status" aria-live="polite"></span>
   </header>
+
+  <section class="hero">
+    <div class="eyebrow">Gear for the long way round</div>
+    <h2>Small catalog. Honest prices.</h2>
+    <p>Six things worth carrying up a hill — and free shipping once your cart passes $50.</p>
+  </section>
+
   <main>
-    <section class="grid" id="products"></section>
-    <aside>
+    <section class="grid" id="products" aria-label="Products"></section>
+    <aside aria-label="Cart">
       <div class="eyebrow">Cart</div>
+      <h3>Your basket</h3>
       <div id="lines"></div>
       <div id="totals"></div>
-      <button id="checkout" style="width:100%;margin-top:12px">Place order</button>
+      <button id="checkout">Place order</button>
     </aside>
   </main>
+
+  <footer>Prices in USD. Demo storefront — no real orders are shipped.</footer>
+
   <script type="module">
     const money = (c) => `$${(c / 100).toFixed(2)}`;
+    const FREE_SHIPPING_THRESHOLD = 5000; // cents, mirrors the API
     const cart = new Map();
     let catalog = [];
 
+    const el = (id) => document.getElementById(id);
+    const initials = (name) => name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+    function setStatus(text, kind) {
+      const node = el("status");
+      node.textContent = text ?? "";
+      node.className = `eyebrow${kind ? ` ${kind}` : ""}`;
+    }
+
     async function render() {
       const items = [...cart].map(([id, qty]) => ({ id, qty }));
-      document.getElementById("lines").innerHTML = items.length
-        ? items.map((i) => `<div class="row"><span>${catalog.find((p) => p.id === i.id).name} × ${i.qty}</span></div>`).join("")
-        : `<p class="eyebrow">Empty</p>`;
+      el("lines").innerHTML = items.length
+        ? items
+            .map((i) => {
+              const product = catalog.find((p) => p.id === i.id);
+              return `<div class="line">
+                <span class="name">${product.name}</span>
+                <span class="qty">
+                  <button data-dec="${i.id}" aria-label="Remove one ${product.name}">−</button>
+                  <span>${i.qty}</span>
+                  <button data-inc="${i.id}" aria-label="Add one ${product.name}">+</button>
+                </span>
+                <span class="price">${money(product.price * i.qty)}</span>
+              </div>`;
+            })
+            .join("")
+        : `<p class="empty">Your cart is empty.</p>`;
+      el("checkout").disabled = items.length === 0;
+
       const t = await (await fetch("/api/cart/total", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ items }) })).json();
-      document.getElementById("totals").innerHTML =
+      const away = FREE_SHIPPING_THRESHOLD - t.subtotal;
+      el("totals").innerHTML =
         `<div class="row"><span>Subtotal</span><span class="price">${money(t.subtotal)}</span></div>` +
-        (t.shipping != null ? `<div class="row"><span>Shipping</span><span class="price">${money(t.shipping)}</span></div>` : "") +
-        `<div class="row total"><span>Total</span><span class="price">${money(t.total)}</span></div>`;
+        (t.shipping != null ? `<div class="row"><span>Shipping</span><span class="price">${t.shipping === 0 ? "Free" : money(t.shipping)}</span></div>` : "") +
+        `<div class="row total"><span>Total</span><span class="price">${money(t.total)}</span></div>` +
+        (items.length && away > 0 ? `<div class="hint">${money(away)} away from free shipping.</div>` : "");
     }
 
     catalog = await (await fetch("/api/products")).json();
-    document.getElementById("products").innerHTML = catalog
-      .map((p) => `<div class="card"><div class="eyebrow">${p.category}</div><strong>${p.name}</strong><span class="price">${money(p.price)}</span><button data-id="${p.id}">Add to cart</button></div>`)
+    el("products").innerHTML = catalog
+      .map(
+        (p) => `<article class="card">
+          <div class="thumb" aria-hidden="true">${initials(p.name)}</div>
+          <span class="chip">${p.category}</span>
+          <strong>${p.name}</strong>
+          <div class="foot">
+            <span class="price">${money(p.price)}</span>
+            <button data-id="${p.id}">Add to cart</button>
+          </div>
+        </article>`
+      )
       .join("");
-    document.getElementById("products").addEventListener("click", (e) => {
+
+    el("products").addEventListener("click", (e) => {
       const id = e.target.dataset?.id;
       if (!id) return;
       cart.set(id, (cart.get(id) ?? 0) + 1);
+      setStatus("");
       render();
     });
-    document.getElementById("checkout").addEventListener("click", async () => {
+
+    el("lines").addEventListener("click", (e) => {
+      const inc = e.target.dataset?.inc;
+      const dec = e.target.dataset?.dec;
+      if (inc) cart.set(inc, (cart.get(inc) ?? 0) + 1);
+      if (dec) {
+        const next = (cart.get(dec) ?? 0) - 1;
+        if (next > 0) cart.set(dec, next);
+        else cart.delete(dec);
+      }
+      if (inc || dec) render();
+    });
+
+    el("checkout").addEventListener("click", async () => {
       const items = [...cart].map(([id, qty]) => ({ id, qty }));
       const r = await fetch("/api/orders", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ items }) });
       const o = await r.json();
-      document.getElementById("status").textContent = r.ok ? `Order ${o.id} placed` : o.error;
+      setStatus(r.ok ? `Order ${o.id} placed` : o.error, r.ok ? "ok" : "err");
       if (r.ok) { cart.clear(); render(); }
     });
+
     render();
   </script>
 </body>
