@@ -30,6 +30,20 @@ test("cart total for single items", async () => {
   assert.equal(t.subtotal, 1450 + 650);
 });
 
+test("shipping is $4.99 when subtotal is below $50", async () => {
+  const t = await (await post("/api/cart/total", { items: [{ id: "p1", qty: 1 }, { id: "p3", qty: 1 }] })).json();
+  assert.equal(t.subtotal, 2100);
+  assert.equal(t.shipping, 499);
+  assert.equal(t.total, 2100 + 499);
+});
+
+test("shipping is free when subtotal is $50 or more", async () => {
+  const t = await (await post("/api/cart/total", { items: [{ id: "p2", qty: 1 }, { id: "p6", qty: 1 }] })).json();
+  assert.equal(t.subtotal, 2200 + 3400);
+  assert.equal(t.shipping, 0);
+  assert.equal(t.total, t.subtotal);
+});
+
 test("placing and reading back an order", async () => {
   const res = await post("/api/orders", { customer: "ana", items: [{ id: "p2", qty: 1 }] });
   assert.equal(res.status, 201);
